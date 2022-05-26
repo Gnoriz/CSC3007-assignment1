@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+<head>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 8px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2 id="timestamp" align=center></h2>
+
+  <div class="main-body" style="overflow-x:auto;">
+    <table>
+      <thread>
+        <tr>
+          <th>Metric</th>
+          <th>National</th>
+          <th>Central</th>
+          <th>West</th>
+          <th>East</th>
+          <th>North</th>
+          <th>South</th>
+        </tr>
+      </thread>
+      <tbody id="table-body" class="display tbody"></tbody>
+    </table>
+  </div>
+
+</body>
+
+<script>
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  $(document).ready(function() {
+    var table = $("#table-body");
+
+    $.ajax({
+      url: 'https://api.data.gov.sg/v1/environment/psi',
+      method: "GET",
+      dataType: "json",
+      success: function(data) {
+        console.log(data);
+
+        const s = data.items[0].update_timestamp;
+        const d = new Date(s);
+        const date = d.getDate()
+        const month = d.getMonth()
+        const year = d.getFullYear()
+        const hr = d.getHours()
+        const min = String(d.getMinutes()).padStart(2, '0')
+
+        console.log(d);
+        const data_info = data.items[0].readings
+        document.getElementById("timestamp").innerHTML = "Last Updated " + date + " " + monthNames[month] + " " + year + ", " + hr + ":" + min;
+        table.empty();
+
+        for (const [key, value] of Object.entries(data_info)) {
+          console.log(key, value);
+
+          table.append(
+            "<tr><td>" + key + "</td>" +
+            "<td>" + value.national + "</td>" +
+            "<td>" + value.central + "</td>" +
+            "<td>" + value.west + "</td>" +
+            "<td>" + value.east + "</td>" +
+            "<td>" + value.north + "</td>" +
+            "<td>" + value.south + "</td></tr>");
+        }
+      }
+    });
+  });
+</script>
+
+</html>
